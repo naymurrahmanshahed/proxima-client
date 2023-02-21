@@ -9,7 +9,7 @@ const ProjectForm = () => {
   const [duration, setDuration] = useState("");
   const [manager, setManager] = useState("");
   const [dev, setDev] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
   const { dispatch } = useProjectContext();
   const handleSubmit = async (e) => {
@@ -39,7 +39,7 @@ const ProjectForm = () => {
       setDuration("");
       setManager("");
       setDev("");
-      setError("");
+      setError(null);
       dispatch({ type: "CREATE_PROJECT", payload: json });
     }
   };
@@ -162,6 +162,7 @@ const ProjectForm = () => {
       >
         Add Project
       </button>
+      {error && <p>{error}</p>}
     </form>
   );
 };
