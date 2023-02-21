@@ -2,6 +2,8 @@ import { useProjectContext } from "../hooks/useProjectContext";
 
 import { currencyFormatter } from "../util/currencyFormatter";
 
+import moment from "moment";
+
 const ProjectDetails = ({ project }) => {
   const { dispatch } = useProjectContext();
   const handleDelete = async () => {
@@ -19,7 +21,7 @@ const ProjectDetails = ({ project }) => {
   };
 
   return (
-    <div className="project bg-slate-800 xl:p-4 p-5 rounded-xl shadow-xl border border-slate-700 flex flex-col gap-5 md:mx-auto  xl:w-[25rem] w-[30rem]">
+    <div className="project bg-slate-800 xl:p-3 p-5 rounded-xl shadow-xl border border-slate-700 flex flex-col gap-5 md:mx-auto  xl:w-[25rem] w-[30rem]">
       <div className="top">
         <span className="text-sky-400">ID: {project?._id}</span>
         <h3 className="text-3xl font-medium truncate ">{project?.title}</h3>
@@ -29,17 +31,17 @@ const ProjectDetails = ({ project }) => {
       </div>
       <div className="mid text-slate-300 flex gap-10">
         <div className="left flex flex-col">
-          <span>Budget: {currencyFormatter(project?.budget)} </span>
+          <span>Budget: {currencyFormatter(project.budget)} </span>
           <span>
-            Added on: {new Date(project?.createdAt).toLocaleDateString()}
+            Added: {moment(project.createdAt).format("MMM DD hh:mm A")}
           </span>
           <span>
-            Last Updated: {new Date(project?.updatedAt).toLocaleDateString()}
+            Updated: {moment(project.updatedAt).format("MMM DD hh:mm A")}
           </span>
         </div>
         <div className="right flex flex-col">
-          <span>Manager: {project?.manager}</span>
-          <span>Developer: {project?.dev}</span>
+          <span>Manager: {project.manager}</span>
+          <span>Developer: {project.dev}</span>
           <span>
             Duration:
             {`${project.duration} week${project.duration === 1 ? "" : "s"}`}
