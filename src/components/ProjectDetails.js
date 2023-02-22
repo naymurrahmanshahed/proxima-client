@@ -1,10 +1,15 @@
+import { useState } from "react";
 import { useProjectContext } from "../hooks/useProjectContext";
 
 import { currencyFormatter } from "../util/currencyFormatter";
 
 import moment from "moment";
+import ProjectForm from "./ProjectForm";
 
 const ProjectDetails = ({ project }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+
   const { dispatch } = useProjectContext();
   const handleDelete = async () => {
     const res = await fetch(
@@ -20,11 +25,19 @@ const ProjectDetails = ({ project }) => {
     }
   };
 
+  const handleUpdate = async () => {
+    setIsModalOpen(true);
+    setIsOverlayOpen(true);
+  };
+  const handleOverlay = async () => {
+    setIsModalOpen(false);
+    setIsOverlayOpen(false);
+  };
   return (
     <div className="project bg-slate-800 xl:p-3 p-5 rounded-xl shadow-xl border border-slate-700 flex flex-col gap-5 md:mx-auto  xl:w-[25rem] w-[30rem]">
       <div className="top">
-        <span className="text-sky-400">ID: {project?._id}</span>
-        <h3 className="text-3xl font-medium truncate ">{project?.title}</h3>
+        <span className="text-sky-400">ID: {project._id}</span>
+        <h3 className="text-3xl font-medium truncate ">{project.title}</h3>
         <span className="uppercase text-xs tracking-widest text-slate-500 font-medium">
           {project.tech}
         </span>
@@ -49,7 +62,10 @@ const ProjectDetails = ({ project }) => {
         </div>
       </div>
       <div className="bottom flex gap-5">
-        <button className="bg-sky-400 text-slate-900 py-2 px-5 rounded shadow-xl hover:bg-sky-50 duration-300">
+        <button
+          onClick={handleUpdate}
+          className="bg-sky-400 text-slate-900 py-2 px-5 rounded shadow-xl hover:bg-sky-50 duration-300"
+        >
           Update
         </button>
         <button
@@ -58,6 +74,25 @@ const ProjectDetails = ({ project }) => {
         >
           Delete
         </button>
+      </div>
+      {/* overlay */}
+      <div
+        onClick={handleOverlay}
+        className={`overlay fixed z-[1] h-screen w-screen bg-slate-900/50 backdrop-blur-sm top-0 left-0 right-0 bottom-0 ${
+          isOverlayOpen ? "" : "hidden"
+        }`}
+      ></div>
+      {/* modal */}
+      <div
+        className={`update-modal  w-[25rem] fixed z-[2] p-2 2xl:p-5 rounded-md top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-800 ${
+          isModalOpen ? "" : "hidden"
+        } `}
+      >
+        <ProjectForm
+          project={project}
+          setIsModalOpen={setIsModalOpen}
+          setIsOverlayOpen={setIsOverlayOpen}
+        />
       </div>
     </div>
   );

@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useProjectContext } from "../hooks/useProjectContext";
 import ProjectTitle from "./ProjectTitle";
 
-const ProjectForm = () => {
-  const [title, setTitle] = useState("");
-  const [tech, setTech] = useState("");
-  const [budget, setBudget] = useState("");
-  const [duration, setDuration] = useState("");
-  const [manager, setManager] = useState("");
-  const [dev, setDev] = useState("");
+const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
+  const [title, setTitle] = useState(project ? project.title : "");
+  const [tech, setTech] = useState(project ? project.tech : "");
+  const [budget, setBudget] = useState(project ? project.budget : "");
+  const [duration, setDuration] = useState(project ? project.duration : "");
+  const [manager, setManager] = useState(project ? project.manager : "");
+  const [dev, setDev] = useState(project ? project.dev : "");
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
 
@@ -18,38 +18,77 @@ const ProjectForm = () => {
 
     // data
     const projectObj = { title, tech, budget, duration, manager, dev };
-    //post req
-    const res = await fetch("http://localhost:5000/api/projects", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(projectObj),
-    });
-    const json = await res.json();
-    console.log(json);
-    //!res.ok set error
-    if (!res.ok) {
-      setError(json.error);
-      setEmptyFields(json.emptyFields);
-    }
-    // res.ok  reset
 
-    if (res.ok) {
-      setTitle("");
-      setTech("");
-      setBudget("");
-      setDuration("");
-      setManager("");
-      setDev("");
-      setError(null);
-      setEmptyFields([]);
-      dispatch({ type: "CREATE_PROJECT", payload: json });
+    // if there is no project,send post req
+    if (!project) {
+      //post req
+      const res = await fetch("http://localhost:5000/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(projectObj),
+      });
+      const json = await res.json();
+      console.log(json);
+      //!res.ok set error
+      if (!res.ok) {
+        setError(json.error);
+        setEmptyFields(json.emptyFields);
+      }
+      // res.ok  reset
+
+      if (res.ok) {
+        setTitle("");
+        setTech("");
+        setBudget("");
+        setDuration("");
+        setManager("");
+        setDev("");
+        setError(null);
+        setEmptyFields([]);
+        dispatch({ type: "CREATE_PROJECT", payload: json });
+      }
+      return;
+    }
+    // if there is a project
+    if (project) {
+      // send patch req
+      const res = await fetch(
+        `http://localhost:5000/api/projects/${project._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(projectObj),
+        }
+      );
+      const json = await res.json();
+      //res.ok
+      if (res.ok) {
+        setError(null);
+        setEmptyFields([]);
+
+        //close overlay & modal
+        setIsModalOpen(false);
+        setIsOverlayOpen(false);
+      }
+      //dispatch
+      dispatch({ type: "UPDATE_PROJECT", payload: json });
+      //!res.ok
+      if (!res.ok) {
+        setError(json.error);
+        setEmptyFields(json.emptyFields);
+      }
+      return;
     }
   };
   return (
-    <form onSubmit={handleSubmit} className="project-form flex flex-col gap-5 ">
-      <ProjectTitle ProjectTitle={"Add a New Project"} />
+    <form onSubmit={handleSubmit} className="project-form flex flex-col gap-2 ">
+      <ProjectTitle
+        ProjectTitle={project ? "Update Project" : "Add a New Project"}
+      />
 
       <div className="form-control flex flex-col gap-2">
         <label
@@ -64,7 +103,7 @@ const ProjectForm = () => {
             setTitle(e.target.value);
           }}
           type="text"
-          className={`bg-transparent border  py-3 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
+          className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
             emptyFields.includes("title")
               ? "border-rose-500"
               : "border-slate-500"
@@ -86,7 +125,7 @@ const ProjectForm = () => {
             setTech(e.target.value);
           }}
           type="text"
-          className={`bg-transparent border  py-3 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
+          className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
             emptyFields.includes("tech")
               ? "border-rose-500"
               : "border-slate-500"
@@ -108,7 +147,7 @@ const ProjectForm = () => {
             setBudget(e.target.value);
           }}
           type="number"
-          className={`bg-transparent border  py-3 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
+          className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
             emptyFields.includes("budget")
               ? "border-rose-500"
               : "border-slate-500"
@@ -130,7 +169,7 @@ const ProjectForm = () => {
             setDuration(e.target.value);
           }}
           type="number"
-          className={`bg-transparent border  py-3 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
+          className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
             emptyFields.includes("duration")
               ? "border-rose-500"
               : "border-slate-500"
@@ -152,7 +191,7 @@ const ProjectForm = () => {
             setManager(e.target.value);
           }}
           type="text"
-          className={`bg-transparent border  py-3 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
+          className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
             emptyFields.includes("manager")
               ? "border-rose-500"
               : "border-slate-500"
@@ -174,7 +213,7 @@ const ProjectForm = () => {
             setDev(e.target.value);
           }}
           type="text"
-          className={`bg-transparent border  py-3 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
+          className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
             emptyFields.includes("dev") ? "border-rose-500" : "border-slate-500"
           }`}
           placeholder="e.g.. 9"
@@ -184,15 +223,11 @@ const ProjectForm = () => {
 
       <button
         type="submit"
-        className="bg-sky-400 text-slate-900 py-3 rounded-lg hover:bg-sky-500 duration-300"
+        className="bg-sky-400 text-slate-900 py-2 rounded-lg hover:bg-sky-500 duration-300"
       >
-        Add Project
+        {project ? "Confirm Update" : "Add Project"}
       </button>
-      {error && (
-        <p className="bg-rose-500/20 rounded-lg p-5 text-rose-500 border border-rose-500 ">
-          {error}
-        </p>
-      )}
+      {error && <p className=" rounded-lg text-rose-500   ">*{error}</p>}
     </form>
   );
 };

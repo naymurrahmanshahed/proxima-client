@@ -17,7 +17,7 @@ const Home = () => {
     getAllProject();
   }, [dispatch]);
   return (
-    <div className="home container mx-auto py-20 grid grid-cols-3 gap-10">
+    <div className="home container mx-auto py-10 xl:py-20 grid grid-cols-3 gap-10">
       <div className="left col-span-2">
         <ProjectTitle ProjectTitle={"All Projects"} />
         <div className="projects-wrapper flex gap-10 flex-wrap">
