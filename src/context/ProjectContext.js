@@ -45,7 +45,6 @@ export const projectReducer = (state, action) => {
 
 export const ProjectContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(projectReducer, initialState);
-  console.log(state);
   return (
     <ProjectContext.Provider value={{ ...state, dispatch }}>
       {children}
