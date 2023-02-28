@@ -1,10 +1,23 @@
 import { useState } from "react";
 import ProjectTitle from "../components/ProjectTitle";
+import { useLogin } from "../hooks/useLogin";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login, error, loading } = useLogin();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    //login
+
+    await login(email, password);
+  };
   return (
-    <form className="login-form flex flex-col gap-5 py-20  mx-auto max-w-sm ">
+    <form
+      onSubmit={handleLogin}
+      className="login-form flex flex-col gap-5 py-20  mx-auto max-w-sm "
+    >
       <div className="text-center">
         <ProjectTitle ProjectTitle={"Login"} />
       </div>
@@ -42,11 +55,13 @@ const Login = () => {
         />
       </div>
       <button
+        disabled={loading}
         type="submit"
         className="bg-sky-400 text-slate-900 py-3 rounded-xl hover:bg-sky-600 duration-300 hover:text-slate-100 "
       >
         Log In
       </button>
+      {error && <p className=" rounded-lg text-rose-500   ">*{error}</p>}
     </form>
   );
 };
