@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useProjectContext } from "../hooks/useProjectContext";
 import ProjectTitle from "./ProjectTitle";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
   const [title, setTitle] = useState(project ? project.title : "");
@@ -13,8 +14,17 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
   const [emptyFields, setEmptyFields] = useState([]);
 
   const { dispatch } = useProjectContext();
+  const { user } = useAuthContext();
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log(user);
+    // if no user
+
+    if (!user) {
+      setError("You Must Be Log In");
+      return;
+    }
 
     // data
     const projectObj = { title, tech, budget, duration, manager, dev };
@@ -26,6 +36,7 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
         },
         body: JSON.stringify(projectObj),
       });
@@ -60,11 +71,13 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
           },
           body: JSON.stringify(projectObj),
         }
       );
       const json = await res.json();
+      console.log(json);
       //res.ok
       if (res.ok) {
         setError(null);
@@ -73,9 +86,10 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
         //close overlay & modal
         setIsModalOpen(false);
         setIsOverlayOpen(false);
+        //dispatch
+        dispatch({ type: "UPDATE_PROJECT", payload: json });
       }
-      //dispatch
-      dispatch({ type: "UPDATE_PROJECT", payload: json });
+
       //!res.ok
       if (!res.ok) {
         setError(json.error);
@@ -104,7 +118,7 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
           }}
           type="text"
           className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
-            emptyFields.includes("title")
+            emptyFields?.includes("title")
               ? "border-rose-500"
               : "border-slate-500"
           }`}
@@ -126,7 +140,7 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
           }}
           type="text"
           className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
-            emptyFields.includes("tech")
+            emptyFields?.includes("tech")
               ? "border-rose-500"
               : "border-slate-500"
           }`}
@@ -148,7 +162,7 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
           }}
           type="number"
           className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
-            emptyFields.includes("budget")
+            emptyFields?.includes("budget")
               ? "border-rose-500"
               : "border-slate-500"
           }`}
@@ -170,7 +184,7 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
           }}
           type="number"
           className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
-            emptyFields.includes("duration")
+            emptyFields?.includes("duration")
               ? "border-rose-500"
               : "border-slate-500"
           }`}
@@ -192,7 +206,7 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
           }}
           type="text"
           className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
-            emptyFields.includes("manager")
+            emptyFields?.includes("manager")
               ? "border-rose-500"
               : "border-slate-500"
           }`}
@@ -214,7 +228,9 @@ const ProjectForm = ({ project, setIsOverlayOpen, setIsModalOpen }) => {
           }}
           type="text"
           className={`bg-transparent border  py-2 px-5 rounded-lg outline-none focus:border-sky-400 duration-300 ${
-            emptyFields.includes("dev") ? "border-rose-500" : "border-slate-500"
+            emptyFields?.includes("dev")
+              ? "border-rose-500"
+              : "border-slate-500"
           }`}
           placeholder="e.g.. 9"
           id="dev"
