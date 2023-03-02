@@ -8,23 +8,25 @@ import { useAuthContext } from "./hooks/useAuthContext";
 function App() {
   const { user } = useAuthContext();
   return (
-    <div className="App bg-slate-900 text-slate-100 min-h-screen">
-      <Navbar />
-      <Routes>
-        <Route
-          path="/"
-          element={user ? <Home /> : <Navigate to="/login" />}
-        ></Route>
-        <Route
-          path="/login"
-          element={!user ? <Login /> : <Navigate to="/" />}
-        ></Route>
-        <Route
-          path="/signup"
-          element={!user ? <Signup /> : <Navigate to="/" />}
-        ></Route>
-        <Route path="*" element={<Navigate to="/" />}></Route>
-      </Routes>
+    <div className="App bg-slate-900 text-slate-100 ">
+      <div className="min-h-screen">
+        <Navbar />
+        <Routes>
+          <Route
+            path="/"
+            element={user ? <Home /> : <Navigate to="/login" />}
+          ></Route>
+          <Route
+            path="/login"
+            element={!user ? <Login /> : <Navigate to="/" />}
+          ></Route>
+          <Route
+            path="/signup"
+            element={!user ? <Signup /> : <Navigate to="/" />}
+          ></Route>
+          <Route path="*" element={<Navigate to="/" />}></Route>
+        </Routes>
+      </div>
       <Footer />
     </div>
   );
